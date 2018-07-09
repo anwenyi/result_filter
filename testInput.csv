@@ -1,5 +1,5 @@
-RecordId,EmployID,Name,Age,Year,Salary
-10021,1,Rob,23,2008,65580
-10022,1,Rob,22,2007,58880
-10058,5,James,20,2018,75555
+RecordId,EmployID,Name,Age,Year,Salary,Type
+10021,1,Rob,23,2008,65580,Sport
+10022,1,Rob,22,2007,58880,Sport
+10058,5,James,20,2018,75555,Art
 
