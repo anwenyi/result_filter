@@ -17,8 +17,8 @@ class DataProcessor(object):
         INDEX_OF_SALARY = 5
         INDEX_OF_EMPLOYEE_ID = 1
 
-        for line in data[1:]:
-            
+        '''Skip the header of the file.'''
+        for line in data[1:]:            
             words = line.split(",")
             
             if len(words)!=LEGAL_LINE_LENGTH:
@@ -38,13 +38,9 @@ class DataProcessor(object):
         with open('filteredOutput.csv', 'w') as csvfile:
             fieldnames = ['RecordId','EmployID','Name','Age','Year','Salary','Type']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
             writer.writeheader()
-            
             for key in resultDict:
-                print(key)
-                print(resultDice.get(key))
-                #writer.writerow(resultDict.get(key))
+                csvfile.write(resultDict.get(key))
            	        
         
 def main(argv):
