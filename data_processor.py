@@ -15,11 +15,16 @@ class DataProcessor(object):
             with open(input_file) as csv_file:
                 data = csv_file.readlines()
                 return data
+        else:
+            return None
 
     """filter each person and get the highest salary record for each person.
         By default , the input records are sorted"""
     def filter_info(self, data):
         result_dict = {}
+
+        if not isinstance(data, list):
+            raise TypeError("The type of the data is not list.")
 
         """skip the header of the file"""
         for line in data[1:]:            
