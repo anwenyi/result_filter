@@ -42,18 +42,20 @@ class DataProcessor(object):
             if len(words) != self.LEGAL_LINE_LENGTH:
                 continue
 
-            """TODO let Bo check"""
-            if not self.is_int(words[self.INDEX_OF_EMPLOYEE_ID]):
+            employee_id = words[self.INDEX_OF_EMPLOYEE_ID]
+            salary = words[self.INDEX_OF_SALARY]
+
+            if not self.is_int(employee_id):
                 raise ValueError("The type of the employee id is not integer.")
 
-            if words[self.INDEX_OF_EMPLOYEE_ID] not in result_dict:
-                result_dict[words[self.INDEX_OF_EMPLOYEE_ID]] = line
+            if employee_id not in result_dict:
+                result_dict[employee_id] = line
             else:
-                old_words = result_dict.get(words[self.INDEX_OF_EMPLOYEE_ID]).split(",")
-
-                if self.is_int(words[self.INDEX_OF_SALARY]) and self.is_int(old_words[self.INDEX_OF_SALARY]) and \
-                        int(words[self.INDEX_OF_SALARY]) > int(old_words[self.INDEX_OF_SALARY]):
-                    result_dict[words[self.INDEX_OF_EMPLOYEE_ID]] = line
+                old_words = result_dict.get(employee_id).split(",")
+                old_salary = old_words[self.INDEX_OF_SALARY]
+                if self.is_int(salary) and self.is_int(old_salary) and \
+                        int(salary) > int(old_salary):
+                    result_dict[employee_id] = line
 
         return result_dict
 
