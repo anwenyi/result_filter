@@ -7,6 +7,7 @@ class DataProcessor(object):
     LEGAL_LINE_LENGTH = 7
     INDEX_OF_SALARY = 5
     INDEX_OF_EMPLOYEE_ID = 1
+    DEFAULT_FILE_HEADER = ['RecordId', 'EmployID', 'Name', 'Age', 'Year', 'Salary', 'Type']
     """
     load_file method loads the file from the current folder and check if it's valid , with open will close file if any
     exception happened
@@ -60,7 +61,7 @@ class DataProcessor(object):
 
     @staticmethod
     def export_result(result_dict, output_file,
-                      fieldnames=['RecordId', 'EmployID', 'Name', 'Age', 'Year', 'Salary', 'Type']):
+                      fieldnames=DEFAULT_FILE_HEADER):
         if os.path.isfile(output_file):
             with open(output_file, 'w') as csv_file:
                 writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
