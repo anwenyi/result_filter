@@ -1,60 +1,98 @@
-import os,sys,csv
+import os
+import sys
+import csv
+
 
 class DataProcessor(object):
-    '''The constructor of the DataProcessor'''
-    def __init__(self, input_file):
-        self.input_file = input_file
+    LEGAL_LINE_LENGTH = 7
+    INDEX_OF_SALARY = 5
+    INDEX_OF_EMPLOYEE_ID = 1
+    DEFAULT_FILE_HEADER = ['RecordId', 'EmployID', 'Name', 'Age', 'Year', 'Salary', 'Type']
+    """
+    load_file method loads the file from the current folder and check if it's valid , with open will close file if any
+    exception happened
+    """
 
-    '''load_file method loads the file from current folder and check if it's valid , with open will close file if any excetption happed '''
-    def load_file(self):
-        with open(self.input_file) as f:
-            data=f.readlines()
-            for line in data:
-                print(line)
-            return data
+    @staticmethod
+    def load_file(input_file):
+        if os.path.isfile(input_file):
+            with open(input_file) as csv_file:
+                data = csv_file.readlines()
+                return data
+        else:
+            return None
 
-    '''filter each person and get the highest salary record for each person.
-        By default , the input records are sorted.'''
-    def filterInfo(self, data):
-        resultDict={}
-        firstline = True
-        for line in data[:-1]:
-            if firstline:
-                firstline = False
-                continue
-            
+    """filter each person and get the highest salary record for each person.
+        By default , the input records are sorted"""
+
+    def filter_info(self, data):
+        result_dict = {}
+
+        if not isinstance(data, list):
+            raise TypeError("The type of the data is not list.")
+
+        """skip the header of the file"""
+        for line in data[1:]:
+            if not isinstance(line, str):
+                line = str(line)
+
             words = line.split(",")
-            print(words[5])
-            
-            if words[1] not in resultDict:
-            	resultDict[str(words[1])]=line
+
+            """if the current line is not long enough or too long then skip the line"""
+            if len(words) != self.LEGAL_LINE_LENGTH:
+                continue
+
+            employee_id = words[self.INDEX_OF_EMPLOYEE_ID]
+            salary = words[self.INDEX_OF_SALARY]
+
+            if not self.is_int(employee_id):
+                raise ValueError("The type of the employee id is not integer.")
+
+            if employee_id not in result_dict:
+                result_dict[employee_id] = line
             else:
-                print("test value "+words[1])
-                print(resultDict.get(''+words[1]))
-                oldWords = resultDict.get(words[1]).split(",")
-                
-                if int(words[5])> int(oldWords[5]):
-                    resultDict[''+str(words[1])]=line
-            print("Dict: ")
-            print(resultDict)
-        
-    '''Export the filted result to a file'''     
-    def export_result(self,resultDict):
-        with open('names.csv', 'w') as csvfile:
-            fieldnames = ['first_name', 'last_name']
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                old_words = result_dict.get(employee_id).split(",")
+                old_salary = old_words[self.INDEX_OF_SALARY]
+                if self.is_int(salary) and self.is_int(old_salary) and \
+                        int(salary) > int(old_salary):
+                    result_dict[employee_id] = line
 
-            writer.writeheader()
-            writer.writerow({'first_name': 'Baked', 'last_name': 'Beans'})
-            writer.writerow({'first_name': 'Lovely', 'last_name': 'Spam'})
-            writer.writerow({'first_name': 'Wonderful', 'last_name': 'Spam'})
-           	        
-        
+        return result_dict
+
+    """Export the filtered result to a file"""
+
+    @staticmethod
+    def export_result(result_dict, output_file,
+                      fieldnames=DEFAULT_FILE_HEADER):
+        if os.path.isfile(output_file):
+            with open(output_file, 'w') as csv_file:
+                writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+                writer.writeheader()
+                if not isinstance(result_dict, dict):
+                    raise DictTypeException("The type of the result_dict is not dictionary.")
+
+                for key in result_dict:
+                    csv_file.write(result_dict.get(key))
+        else:
+            raise TypeError("The output file is valid.")
+
+    @staticmethod
+    def is_int(value):
+        try:
+            int(value)
+            return True
+        except ValueError:
+            return False
+
+
+class DictTypeException(Exception):
+    pass
+
 def main(argv):
-    dataP1 = DataProcessor("./testInput.csv")
-    data = dataP1.load_file()
-    dataP1.filterInfo(data)
-    dataP1.export_result(data)
+    data_p = DataProcessor()
+    data = data_p.load_file("./testInput.csv")
+    data_p.export_result(data_p.filter_info(data), "./filteredOutput.csv")
 
-if __name__=="__main__":
-    main(sys.argv[1:]) 
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
